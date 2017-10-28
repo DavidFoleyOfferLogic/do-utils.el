@@ -113,7 +113,8 @@
   (:key "A"
         :name doutils/instances-action-popup
         :funcs ( (?C "SSH Into Instance" doutils/instances-ssh-into-instance)
-                 (?A "Run Shell Command on Instance" doutils/run-command-to-instance)))))
+                 (?S "Run Shell Command on Instance" doutils/run-shell-command-to-instance)
+                 (?E "Run Emacs Command on Instance" doutils/run-emacs-command-to-instance)))))
 
 ;;;###autoload
 (defun digitalocean-instances ()
