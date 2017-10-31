@@ -121,6 +121,15 @@
     (let ((default-directory instance-default-directory))
       (counsel-M-x))))
 
+(defun doutils/run-dired-on-instance (ids)
+  "SSH into aws instance with IDS."
+  (if (/= 1 (length ids))
+      (error "Multiple instances cannot be selected."))
+  (let* ((id (nth 0 ids))
+         (instance-default-directory (doutils/parse-default-directory id)))
+    (let ((default-directory instance-default-directory))
+      (dired default-directory))))
+
 (tblui-define
  digitalocean-instances
  doutils/droplets-get-tabulated-list-entries
@@ -136,7 +145,8 @@
         :name doutils/instances-action-popup
         :funcs ( (?C "SSH Into Instance" doutils/instances-ssh-into-instance)
                  (?S "Run Shell Command on Instance" doutils/run-shell-command-on-instance)
-                 (?E "Run Emacs Command on Instance" doutils/run-emacs-command-on-instance)))))
+                 (?E "Run Emacs Command on Instance" doutils/run-emacs-command-on-instance)
+                 (?D "Run Dired on Instance" doutils/run-dired-on-instance)))))
 
 ;;;###autoload
 (defun digitalocean-instances ()
