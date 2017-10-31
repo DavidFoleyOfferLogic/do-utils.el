@@ -94,6 +94,11 @@
   (setq ip-address (doutils/parse-droplet-ip-address (elt json 0)))
   (concat "/ssh:" droplet-username "@" ip-address ":/home/" droplet-username))
 
+(defun doutils/inspect-droplet-as-json (id)
+  "Parse the new default directory for a droplet."
+  (setq json (doutils/doctl-response-as-json (concat "doctl compute droplet get " id " --output json")))
+  (elt json 0))
+
 (defun doutils/instances-ssh-into-instance (ids)
   "SSH into aws instance with IDS."
   (if (/= 1 (length ids))
@@ -129,6 +134,18 @@
          (instance-default-directory (doutils/parse-default-directory id)))
     (let ((default-directory instance-default-directory))
       (dired default-directory))))
+
+(defun doutils/instances-inspect-instances (ids)
+  "Show instance details."
+  (if (/= 1 (length ids))
+      (error "Multiple instances cannot be selected."))
+  (let* ((id (nth 0 ids))
+         (droplet-details-json (doutils/inspect-droplet-as-json id))
+         (output-buffer (get-buffer-create "droplet-inspect")))
+    (with-current-buffer output-buffer
+      (insert droplet-details-json))
+    (message "json: %s" droplet-details-json)
+    (display-buffer output-buffer)))
 
 (tblui-define
  digitalocean-instances
