@@ -30,6 +30,7 @@
 (require 'json)
 (require 'dash)
 (require 's)
+(require 'tblui)
 
 ;; json library reference page: http://tess.oconnor.cx/2006/03/json.el
 
@@ -86,18 +87,39 @@
   (if (string= "" user-name) (setq user-name (user-login-name)))
   user-name)
 
+(defun doutils/parse-default-directory (id)
+  "Parse the new default directory for a droplet."
+  (setq droplet-username doutils/username)
+  (setq json (doutils/doctl-response-as-json (concat "doctl compute droplet get " id " --output json")))
+  (setq ip-address (doutils/parse-droplet-ip-address (elt json 0)))
+  (concat "/ssh:" droplet-username "@" ip-address ":/home/" droplet-username))
+
 (defun doutils/instances-ssh-into-instance (ids)
   "SSH into aws instance with IDS."
   (if (/= 1 (length ids))
       (error "Multiple instances cannot be selected."))
   (let* ((id (nth 0 ids))
-         (droplet-username doutils/username)
-         (json (doutils/doctl-response-as-json (concat "doctl compute droplet get " id " --output json")))
-         (ip-address (doutils/parse-droplet-ip-address (elt json 0))))
-    (setq instance-default-directory (concat "/ssh:" droplet-username "@" ip-address ":/home/" droplet-username))
-    (message "instance default-directory: %s" instance-default-directory)
+         (instance-default-directory (doutils/parse-default-directory id)))
     (let ((default-directory instance-default-directory))
       (better-shell-for-current-dir))))
+
+(defun doutils/run-shell-command-on-instance (ids)
+  "SSH into aws instance with IDS."
+  (if (/= 1 (length ids))
+      (error "Multiple instances cannot be selected."))
+  (let* ((id (nth 0 ids))
+         (instance-default-directory (doutils/parse-default-directory id)))
+    (let ((default-directory instance-default-directory))
+      (shell-command (read-string "Shell command: ")))))
+
+(defun doutils/run-emacs-command-on-instance (ids)
+  "SSH into aws instance with IDS."
+  (if (/= 1 (length ids))
+      (error "Multiple instances cannot be selected."))
+  (let* ((id (nth 0 ids))
+         (instance-default-directory (doutils/parse-default-directory id)))
+    (let ((default-directory instance-default-directory))
+      (counsel-M-x))))
 
 (tblui-define
  digitalocean-instances
@@ -113,8 +135,8 @@
   (:key "A"
         :name doutils/instances-action-popup
         :funcs ( (?C "SSH Into Instance" doutils/instances-ssh-into-instance)
-                 (?S "Run Shell Command on Instance" doutils/run-shell-command-to-instance)
-                 (?E "Run Emacs Command on Instance" doutils/run-emacs-command-to-instance)))))
+                 (?S "Run Shell Command on Instance" doutils/run-shell-command-on-instance)
+                 (?E "Run Emacs Command on Instance" doutils/run-emacs-command-on-instance)))))
 
 ;;;###autoload
 (defun digitalocean-instances ()
