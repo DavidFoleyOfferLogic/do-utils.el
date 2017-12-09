@@ -160,8 +160,8 @@
 
   (:key "A"
         :name doutils/instances-action-popup
-        :funcs ( (?C "SSH Into Instance" doutils/instances-ssh-into-instance)
-                 (?S "Run Shell Command on Instance" doutils/run-shell-command-on-instance)
+        :funcs ( (?S "SSH Into Instance" doutils/instances-ssh-into-instance)
+                 (?C "Run Shell Command on Instance" doutils/run-shell-command-on-instance)
                  (?E "Run Emacs Command on Instance" doutils/run-emacs-command-on-instance)
                  (?D "Run Dired on Instance" doutils/run-dired-on-instance)))))
 
