@@ -43,7 +43,7 @@
 (defun doutils/parse-droplet-ip-address (droplet)
   (setq networks (plist-get droplet ':networks))
   (setq v4 (plist-get networks ':v4))
-  (setq i1 (elt v4 1))
+  (setq i1 (elt v4 0))
   (setq ip-address (plist-get i1 ':ip_address))
   ip-address)
 
